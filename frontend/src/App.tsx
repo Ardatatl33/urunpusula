@@ -16,23 +16,29 @@ function App() {
   }, [])
 
   return (
-    <main>
+    <main className="product-page">
       <h1>ÜrünPusula</h1>
 
-      {isLoading && <p>Ürünler yükleniyor...</p>}
-      {error && <p>{error}</p>}
+      {isLoading && <p className="status-message">Ürünler yükleniyor...</p>}
+      {error && <p className="status-message error-message">{error}</p>}
 
       {!isLoading && !error && (
-        <ul>
+        <ul className="product-list">
           {products.map((product) => (
-            <li key={product.id}>
-              <strong>
+            <li className="product-card" key={product.id}>
+              <h2>
                 {product.brand} {product.name}
-              </strong>
-              <span>
-                {product.storage_gb} GB · {product.ram_gb} GB RAM ·{' '}
-                {product.screen_inches} inç
-              </span>
+              </h2>
+              <p className="product-specs">
+                {product.storage_gb} GB depolama · {product.ram_gb} GB RAM
+              </p>
+              <p className="product-specs">
+                {product.screen_inches} inç ekran · {product.battery_mah} mAh pil
+              </p>
+              <p className="product-specs">
+                {product.main_camera_mp} MP ana kamera ·{' '}
+                {product.has_5g ? '5G destekli' : '5G desteği yok'}
+              </p>
             </li>
           ))}
         </ul>
