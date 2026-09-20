@@ -1,7 +1,7 @@
 from collections.abc import Generator
 
 from fastapi import APIRouter, Depends
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from app.database import SessionLocal
@@ -22,6 +22,21 @@ def get_db() -> Generator[Session, None, None]:
 
 
 @router.get("", response_model=list[ProductResponse])
-def list_products(db: Session = Depends(get_db)):
-    statement = select(Product).order_by(Product.id)
+def list_products(
+    q: str | None = None,
+    db: Session = Depends(get_db),
+):
+    statement = select(Product)
+
+    if q:
+        search_text = f"%{q}%"
+        statement = statement.where(
+            or_(
+                Product.name.ilike(search_text),
+                Product.brand.ilike(search_text),
+            )
+        )
+
+    statement = statement.order_by(Product.id)
+
     return db.scalars(statement).all()
