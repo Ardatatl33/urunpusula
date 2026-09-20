@@ -8,6 +8,9 @@ from app.database import SessionLocal
 from app.models.product import Product
 from app.schemas.product import ProductResponse
 
+from app.models.offer import Offer
+from app.schemas.offer import OfferResponse
+
 
 router = APIRouter(prefix="/products", tags=["Products"])
 
@@ -55,3 +58,24 @@ def get_product(
         )
 
     return product
+
+@router.get("/{product_id}/offers", response_model=list[OfferResponse])
+def list_product_offers(
+    product_id: int,
+    db: Session = Depends(get_db),
+):
+    product = db.get(Product, product_id)
+
+    if product is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Product not found",
+        )
+
+    statement = (
+        select(Offer)
+        .where(Offer.product_id == product_id)
+        .order_by(Offer.price)
+    )
+
+    return db.scalars(statement).all()
