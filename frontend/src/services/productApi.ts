@@ -2,8 +2,19 @@ import type { Product } from '../types/product'
 
 const API_BASE_URL = 'http://127.0.0.1:8000'
 
-export async function fetchProducts(): Promise<Product[]> {
-  const response = await fetch(`${API_BASE_URL}/products`)
+export async function fetchProducts(query?: string): Promise<Product[]> {
+  const params = new URLSearchParams()
+
+  if (query?.trim()) {
+    params.set('q', query.trim())
+  }
+
+  const queryString = params.toString()
+  const url = queryString
+    ? `${API_BASE_URL}/products?${queryString}`
+    : `${API_BASE_URL}/products`
+
+  const response = await fetch(url)
 
   if (!response.ok) {
     throw new Error('Ürünler alınamadı.')
